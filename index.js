@@ -56,6 +56,7 @@ var sessions = {};
 // the keys are the user IDs (strings)
 // the values have the form: {
 //   id: '3d16d961f67e9792',        // 8 random octets
+//   name: 'patrick, j              // chosen name
 //   sessionId: 'cba82ca5f59a35e6', // id of the session, if one is joined
 //   socket: <websocket>,           // the websocket
 //   typing: false                  // whether the user is typing or not
@@ -176,17 +177,29 @@ function padIntegerWithZeros(x, minWidth) {
 
 io.on('connection', function(socket) {
   var userId = makeId();
+  var userName = null;
+
   while (users.hasOwnProperty(userId)) {
     userId = makeId();
   }
+
   users[userId] = {
     id: userId,
     sessionId: null,
+    name: null,
     socket: socket,
     typing: false
   };
+
   socket.emit('userId', userId);
   console.log('User ' + userId + ' connected.');
+
+  // get chosen username and store it
+  socket.on('userName', function(data){
+    users[data["userId"]]["name"] = data["userName"];
+    userName = data["userName"];
+    console.log('user '+ userId + ' has username: ' + userName);
+  });
 
   // precondition: sessionId is the id of a session
   // precondition: notToThisUserId is the id of a user, or null
@@ -217,7 +230,8 @@ io.on('connection', function(socket) {
       body: body,
       isSystemMessage: isSystemMessage,
       timestamp: new Date(),
-      userId: userId
+      userId: userId,
+      userName: userName
     };
     sessions[users[userId].sessionId].messages.push(message);
 
@@ -227,7 +241,8 @@ io.on('connection', function(socket) {
         body: message.body,
         isSystemMessage: isSystemMessage,
         timestamp: message.timestamp.getTime(),
-        userId: message.userId
+        userId: message.userId,
+        userName: message.userName
       });
     });
   };
