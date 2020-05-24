@@ -340,6 +340,7 @@ io.on('connection', function(socket) {
         lastKnownTimeUpdatedAt: new Date(data.lastKnownTimeUpdatedAt),
         messages: lodash.map(data.messages, function(message) { return {
           userId: message.userId,
+          userName: message.userName,
           body: message.body,
           isSystemMessage: message.isSystemMessage,
           timestamp: new Date(message.timestamp)
@@ -407,7 +408,8 @@ io.on('connection', function(socket) {
         body: message.body,
         isSystemMessage: message.isSystemMessage,
         timestamp: message.timestamp.getTime(),
-        userId: message.userId
+        userId: message.userId,
+        userName: message.userName
       }; }),
       sessionId: users[userId].sessionId,
       state: sessions[users[userId].sessionId].state
@@ -451,7 +453,8 @@ io.on('connection', function(socket) {
         body: message.body,
         isSystemMessage: message.isSystemMessage,
         timestamp: message.timestamp.getTime(),
-        userId: message.userId
+        userId: message.userId,
+        userName: message.userName
       }; }),
       ownerId: sessions[sessionId].ownerId,
       state: sessions[sessionId].state
