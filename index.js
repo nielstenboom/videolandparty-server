@@ -186,7 +186,7 @@ io.on('connection', function(socket) {
   users[userId] = {
     id: userId,
     sessionId: null,
-    name: null,
+    name: "Anonymous",
     socket: socket,
     typing: false
   };
@@ -196,9 +196,11 @@ io.on('connection', function(socket) {
 
   // get chosen username and store it
   socket.on('userName', function(data){
-    users[data["userId"]]["name"] = data["userName"];
-    userName = data["userName"];
-    console.log('user '+ userId + ' has username: ' + userName);
+    if(data["userId"] in users){
+      users[data["userId"]]["name"] = data["userName"];
+      userName = data["userName"];
+      console.log('user '+ userId + ' has username: ' + userName);
+    }
   });
 
   // precondition: sessionId is the id of a session
